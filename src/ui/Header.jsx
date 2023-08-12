@@ -1,14 +1,18 @@
-import { Link } from "react-router-dom"
-import SearchOrder from "../features/order/SearchOrder"
+import { Link } from 'react-router-dom';
+import SearchOrder from '../features/order/SearchOrder';
+import UserName from '../features/user/UserName';
 
-const Header = () => {
+function Header() {
   return (
-    <header>
-      <Link to='/'>LOGO COMPANY</Link>
-      <SearchOrder/>
-      <h3>KokaDevops</h3>
+    <header className="flex items-center justify-between border-b border-stone-200 bg-orange-400 px-4 py-3 uppercase sm:px-6">
+      <Link to="/" className="tracking-widest">
+        React Pizza
+      </Link>
 
+      <SearchOrder />
+      <UserName />
     </header>
-  )
+  );
 }
-export default Header
+
+export default Header;
