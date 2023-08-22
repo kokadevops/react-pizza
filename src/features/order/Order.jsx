@@ -1,15 +1,27 @@
+// Test ID: IIDSAT
+import { useFetcher, useLoaderData } from "react-router-dom";
+
 import OrderItem from "./OrderItem";
 
-import { useLoaderData } from "react-router-dom";
 import { getOrder } from "../../services/apiRestaurant";
 import {
   calcMinutesLeft,
   formatCurrency,
   formatDate,
 } from "../../utils/helpers";
+import { useEffect } from "react";
+import UpdateOrder from "./UpdateOrder";
 
 function Order() {
   const order = useLoaderData();
+  const fetcher = useFetcher();
+
+  useEffect(
+    function () {
+      if (!fetcher.data && fetcher.state === "idle") fetcher.load("/menu");
+    },
+    [fetcher],
+  );
 
   const {
     id,
@@ -34,7 +46,7 @@ function Order() {
               Priority
             </span>
           )}
-          <span className="rounded-full bg-orange-500 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-orange-50">
+          <span className="rounded-full bg-green-500 px-3 py-1 text-sm font-semibold uppercase tracking-wide text-green-50">
             {status} order
           </span>
         </div>
@@ -43,7 +55,7 @@ function Order() {
       <div className="flex flex-wrap items-center justify-between gap-2 bg-stone-200 px-6 py-5">
         <p className="font-medium">
           {deliveryIn >= 0
-            ? `Only ${calcMinutesLeft(estimatedDelivery)} minutes left 😃`
+            ? `Only ${calcMinutesLeft(estimatedDelivery)} minutes left`
             : "Order should have arrived"}
         </p>
         <p className="text-xs text-stone-500">
@@ -53,7 +65,15 @@ function Order() {
 
       <ul className="dive-stone-200 divide-y border-b border-t">
         {cart.map((item) => (
-          <OrderItem item={item} key={item.id} />
+          <OrderItem
+            item={item}
+            key={item.pizzaId}
+            isLoadingIngredients={fetcher.state === "loading"}
+            ingredients={
+              fetcher?.data?.find((el) => el.id === item.pizzaId)
+                ?.ingredients ?? []
+            }
+          />
         ))}
       </ul>
 
@@ -70,6 +90,8 @@ function Order() {
           To pay on delivery: {formatCurrency(orderPrice + priorityPrice)}
         </p>
       </div>
+
+      {!priority && <UpdateOrder order={order} />}
     </div>
   );
 }
